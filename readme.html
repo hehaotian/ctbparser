@@ -1,0 +1,131 @@
+<html>
+	<head>
+		<title>ctbparser</title>
+	</head>
+
+<body>
+	<h1>ctbparser 0.11</h1>
+	<a href="readme_cn.html">中文版本</a>
+	<h2>Contents</h2>
+	<ul>
+      		<li><a href="#introduction">Introduction</a></li>
+      		<li><a href="#highlights">Highlights</a></li>
+      		<li><a href="#news">News</a></li>
+      		<li><a href="#usage">Usage</a></li>
+      		<li><a href="#other">Other</a></li>
+      	</ul>
+	<h2><a name="introduction">Introduction</a></h2>
+      	<p>ctbparser is an open source Chinese proceesing toolkit for Chinese word segmentation, part of speech tagging and dependency parsing using Chinese Tree Bank standard.</p>
+      	
+      	
+	<h2><a name="highlights">Highlights</a></h2>
+	<ul>
+		<li>Using 2D Trie structure for fast parsing.</li>
+		<li>Dictionary can be edit manually to add or remove words.</li>
+		<li>All models (word segmentation, part of speech tagging, dependency parsing) are learnt by Conditional Random Fields.</li>
+		<li>Can perform n-best outputs.</li>
+		<li>Can output marginal probabilities for all candidates.</li>
+	</ul>
+	
+	
+	<h2><a name="news">News</a></h2>
+	<ul>
+		<li>ctbparser 0.11</li>
+		<ul>
+			<li>Add a rules to segment number sequence or letter sequence as a whole.</li>
+			<li>Improve person name recognition</li>
+		</ul>
+		<li>ctbparser 0.10</li>
+		<ul>
+			<li>First version released</li>
+		</ul>
+	</ul>
+
+	<h2><a name="usage">Usage</a></h2>
+	<ul>
+		<li>Testing ctbparser on your computer</li>
+		<p>After downloading ctbparser package, unzip it, and switch to the directory that contains this document.<br>
+		If you are in Windows platform, type the following command:<br>
+		<b>ctbparser</b><br>
+		If you use Linux or cgywin, you could follow the steps below:<br>
+		Type command to generate ctbparser:<br>
+		<b>make</b><br>
+		Then type command to test:<br>
+		<b>./ctbparser</b><br>
+		</p>
+		
+		<li>APIs</li>
+		<p>File "main.cpp" is an example for calling ctbparser. There are 3 public functions:<br>
+		<font color=#0000aa>bool ctbparser::load_config(char *fn);</font><font color=#00aa00>//load parameters from config file for initialization. Parameter <I>fn</I> is config file name</font><br>
+		<font color=#0000aa>void ctbparser::decode_string(char *in, char *out);</font><font color=#00aa00>//decode (segment, POS tag or parse) string <I>in</I> and output the result to string <I>out</I></font><br>
+		<font color=#0000aa>void ctbparser::decode_file(char *fn_in, char *fn_out);</font><font color=#00aa00>//decode (segment, POS tag or parse) text in file <I>fn_in</I> and output the result to file <I>fn_out</I></font><br>
+		</p>
+		
+		
+		<li>config file</li>
+		<p>
+		Each line in config file has 2 columns, separated by tabular character. First columns are parameter names, second columns are their values.<br>
+		
+		All the parameters are given below:
+		</p>
+		<table border=1>
+		<tr><td>name</td><td>meaning</td></tr>
+		<tr><td>nbest</td><td>Let ctbparser output the n best decoding results. If nbest > 1, ctbparser will output the probabilities of results. </td></tr>
+		<tr><td>full</td><td>1: Results are coded in GB2312. (Traditional Chinese characters and ASCII characters are converted to simplified Chinese)</td></tr>
+		<tr><td>seg_model_file</td><td>File name of model for word segmemtation.</td></tr>
+		<tr><td>pos_model_file</td><td>File name of model for POS tagging.</td></tr>
+		<tr><td>parser_model_file</td><td>File name of model for parsing.</td></tr>
+		<tr><td>dict_file</td><td>File name of customized dictionary. See instructions for dict file for details</td></tr>
+		<tr><td>segsen</td><td>0: Sentence segmentation is not required, each line in input text are a sentence. 1: input text are segmented in to sentences before decoding.</td></tr>
+		<tr><td>task</td><td>seg: just do word segmentation; pos: segmentation + POS tagging; parse: segmentation + POS tagging + dependency parsing.</td></tr>
+		</table>
+		
+		<li>dict file</li>
+		<p>
+		The dict file could be edit manually for customized words. 
+		Each line in dictionary file has 3 columns, separated by tabular character: word, pos tag, weight. 
+		ctbparser detects the words in dictionary and assigned their POS tags regardless the CRF model. Weights are used for detection confiction. In short,
+		words with higher weights are more possibly detected.
+		To edit the dict file, there are 3 notations:
+		<ul>
+			<li>Words are not necessarily arranged in alphbet ordered.	</li>
+			<li>All words should be GB2312 coded, for example ASCII '1' should be replaced by '１'. ctbparser will throw out warning and convert illegal characters to GB2312 automatically.</li>
+			<li>All POS tags should be in <a href="http://www.cis.upenn.edu/~chinese/posguide.3rd.ch.pdf">CTB POS tag set</a>, for unknown POS, set POS with '-' </li>
+		</ul>
+		</p>
+		<li>Output format</li>
+		<p>
+		Each line in the output text is a sentence. Words in the sentence are separated by 2 blanks. <br>
+		If task is word segmentation, the output format is like
+		<pre>
+		南非  世界杯  ，  斯洛文尼亚  1  :  0  战胜  了  阿尔及利亚  。
+		</pre>
+		If task is POS tagging the result is like
+		<pre>
+		南非/NR  世界杯/NR  ，/PU  斯洛文尼亚/NR  1/NN  :/PU  0/NN  战胜/VV  了/AS  阿尔及利亚/NR  。/PU
+		</pre>
+		If task is parse, the result is like
+		<pre>
+		南非/NR/1/NMOD  世界杯/NR/4/NMOD  ，/PU/4/P  斯洛文尼亚/NR/4/NMOD  1/NN/7/VMOD  :/PU/7/P  0/NN/7/SUB  战胜/VV/11/  了/AS/7/VMOD  阿尔及利亚/NR/7/VMOD  。/PU/7/P
+		</pre>
+		Each token is formatted as "word/POS/head position/dependency type". The head position is the position of its head word in the sentence. (0 is the first word)
+		Head position of root in dependency tree is the sentence length. Dependency type of the root is "". Here, for example, the head word of '阿尔及利亚' is '战胜', parse root is '战胜'
+		</p>
+		
+		
+		
+	<h2><a name="other">Other</a></h2>
+	<ul>
+		<li>
+		<p>Current version can not train models. Word segmentation and POS tagging models are trained using <a href="http://sourceforge.net/projects/pocket-crf-1/files/">Pocket CRF 0.47</a>,
+		 and the dependency parsing model are trained using <a href="http://crfparser.sourceforge.net/">crfparser 0.10</a>. Training corpus is <a href="http://www.cis.upenn.edu/~chinese/ctb.html">CTB6</a> standard training set. To reduce model file size, L1-CRF algorithm is used.
+		 On standard CTB6 test set, ctbparser achieves 95.3% F1 score for word segmentation, 94.27% accuracy for POS tagging and 81% LAS for dependency parsing. Processing (including word segmentation, POS tagging and parsing) speed is 30 sentences per second, memory cost is about 270M bytes. (Operating System: 64bit CentOS 5, CPU: Intel(R) Xeon(R) E5405, 2.00GHz)<br>
+		 The default dictionary is collected from web. e.g., <a href="http://pinyin.sogou.com/dict/">sogou dictionary</a>
+		 </p>
+		 </li>
+	</ul>
+	<hr>
+	Contact: <i>qianxian@fudan.edu.cn</i>
+	</body>
+</html>
+

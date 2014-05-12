@@ -1,0 +1,127 @@
+<html>
+	<head>
+		<title>ctbparser</title>
+	</head>
+
+<body>
+	
+	<h1>ctbparser 0.11</h1>
+	<a href="readme.html">English Version</a>
+	<h2>目录</h2>
+	<ul>
+      		<li><a href="#introduction">简介</a></li>
+      		<li><a href="#highlights">优点</a></li>
+      		<li><a href="#news">版本</a></li>
+      		<li><a href="#usage">用法</a></li>
+      		<li><a href="#other">其他</a></li>
+      	</ul>
+	<h2><a name="introduction">简介</a></h2>
+      	<p>ctbparser是一个开源的中文处理工具包，用于分词、词性标注、句法分析，采用的是中文宾州树库标准</p>
+      	
+      	
+	<h2><a name="highlights">优点</a></h2>
+	<ul>
+		<li>采用两维Trie结构加速句法分析</li>
+		<li>用户可自己编辑词条</li>
+		<li>分词、词性标注、句法分析都基于条件随机场模型</li>
+		<li>可输出最好的n个结果</li>
+		<li>可以输出结果的概率</li>
+	</ul>
+	
+	
+	<h2><a name="news">版本</a></h2>
+	<ul>
+		<li>ctbparser 0.11</li>
+		<ul>
+			<li>将连续的字母或数字强制分为一个单词</li>
+			<li>改进了人名识别</li>
+		</ul>
+		<li>ctbparser 0.10</li>
+		<ul>
+			<li>第一版</li>
+		</ul>
+	</ul>
+
+	<h2><a name="usage">用法</a></h2>
+	<ul>
+		<li>在你的机器上测试ctbparser</li>
+		<p>下载完毕后，解压，并切换到含有该文件的目录<br>
+		如果你用的是windows系统，用如下命令：<br>
+		<b>ctbparser</b><br>
+		如果你用的是linux系统，用如下命令生成ctbparser并测试：<br>
+		<b>make</b><br>
+		<b>./ctbparser</b><br>
+		</p>
+		
+		<li>API</li>
+		<p>文件"main.cpp"就是一个调用样例，有3个公共函数：<br>
+		<font color=#0000aa>bool ctbparser::load_config(char *fn);</font><font color=#00aa00>//读取配置文件，并初始化。参数<I>fn</I>是配置文件的文件名</font><br>
+		<font color=#0000aa>void ctbparser::decode_string(char *in, char *out);</font><font color=#00aa00>//对字符串<I>in</I>解码（分词、词性标注、句法分析）并输出到字符串<I>out</I></font><br>
+		<font color=#0000aa>void ctbparser::decode_file(char *fn_in, char *fn_out);</font><font color=#00aa00>//对文件<I>fn_in</I>解码（分词、词性标注、句法分析）并输出到文件<I>fn_out</I></font><br>
+		</p>
+		
+		
+		<li>配置文件说明</li>
+		<p>
+		每一行含有两个字段，用制表符隔开，第一个字段是参数名，第二个字段是该参数的值。<br>
+		
+		下表给出了所有参数的说明：
+		</p>
+		<table border=1>
+		<tr><td>参数名</td><td>含义</td></tr>
+		<tr><td>nbest</td><td>让ctbparser输出最优的nbest个结果。如果nbest > 1，则ctbparser输出每个结果的概率。</td></tr>
+		<tr><td>full</td><td>1: 输出的结果中用GB2312编码。（繁体将化简，ASC码将转为全角）</td></tr>
+		<tr><td>seg_model_file</td><td>分词模型的文件名</td></tr>
+		<tr><td>pos_model_file</td><td>词性标注模型的文件名</td></tr>
+		<tr><td>parser_model_file</td><td>句法分析模型的文件名</td></tr>
+		<tr><td>dict_file</td><td>含用户词条的字典，相见字典文件说明</td></tr>
+		<tr><td>segsen</td><td>0: 无需分句，输入的文本每一行代表一句。1: 先分句，再解码</td></tr>
+		<tr><td>task</td><td>seg: 只分词；pos: 分词+词性标注；parse: 分词、词性标注、句法分析</td></tr>
+		</table>
+		
+		<li>字典文件说明</li>
+		<p>字典文件是一个可手工编辑的文件，用于存放用户的词条。每一行是一个词条，含3个字段，用制表符隔开。3个字段分别是：词、词性、权重。
+		手工编辑的词条如果在句子中出现，必将被分为一个词。如果词条匹配有冲突，那么取权重最大的匹配结果。
+		编辑该词典时需要注意3点：
+		<ul>
+			<li>词条无需按字母顺序排放</li>
+			<li>所有词必须是GB2312编码，比如ASC码中的'1'应记为'１'。对于非GB2312的字符，ctbparser将提出警告，并作自动转化</li>
+			<li>所有词性必须在<a href="http://www.cis.upenn.edu/~chinese/posguide.3rd.ch.pdf">CTB的词性标注集合</a>中，如果不给出词的词性，将词性设为'-'</li>
+		</ul>
+		</p>
+		<li>输出格式</li>
+		<p>
+		每句一行，词与词之间用两个空格隔开。<br>
+		如果任务只是分词，那么一个输出样例如下所示：
+		<pre>
+		南非  世界杯  ，  斯洛文尼亚  1  :  0  战胜  了  阿尔及利亚  。
+		</pre>
+		如果任务是词性标注，那么一个输出样例如下所示：
+		<pre>
+		南非/NR  世界杯/NR  ，/PU  斯洛文尼亚/NR  1/NN  :/PU  0/NN  战胜/VV  了/AS  阿尔及利亚/NR  。/PU
+		</pre>
+		如果任务是句法分析，那么一个输出样例如下所示：
+		<pre>
+		南非/NR/1/NMOD  世界杯/NR/4/NMOD  ，/PU/4/P  斯洛文尼亚/NR/4/NMOD  1/NN/7/VMOD  :/PU/7/P  0/NN/7/SUB  战胜/VV/11/  了/AS/7/VMOD  阿尔及利亚/NR/7/VMOD  。/PU/7/P
+		</pre>
+		每个词的格式为"词/词性/父亲词位置/依存类型"。父亲词位置是该词的父亲词在句子中的位置（0是第一个位置）。
+		根结点的父亲词位置为句子的长度，其依存类型是空串""。比如在这个例子中，'阿尔及利亚'的父亲是'战胜'，句法树的根结点是'战胜'。
+		</p>
+		
+		
+		
+	<h2><a name="other">其他</a></h2>
+	<ul>
+		<li>
+		<p>目前的版本没有提供训练接口。分词和词性标注的模型是通过<a href="http://sourceforge.net/projects/pocket-crf-1/files/">Pocket CRF 0.47</a>训练得到的，
+		依存句法分析模型是通过<a href="http://crfparser.sourceforge.net/">crfparser 0.10</a>工具包得到的。训练语料是<a href="http://www.cis.upenn.edu/~chinese/ctb.html">CTB6</a>标准训练集合。为了得到小一点的模型，采用的是L1-CRF训练算法。
+		 在CTB6标准测试集上，ctbparser分词得到95.3% F1值，词性标注精度94.27%，句法分析精度81%。处理速度（包括分词、词性标注、句法分析）的速度是每秒30句，内存占用为270M。（操作系统：64位CentOS 5，CPU: Intel(R) Xeon(R) E5405, 2.00GHz）<br>
+		 默认的词典从网上搜集得到，比如<a href="http://pinyin.sogou.com/dict/">sogou词典库</a>
+		 </p>
+		 </li>
+	</ul>
+	<hr>
+	联系：<i>qianxian@fudan.edu.cn</i>
+	</body>
+</html>
+

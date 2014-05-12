@@ -1,0 +1,9 @@
+nbest	1
+full	0
+seg_model_file	seg_model_l1
+pos_model_file	pos_model_l1
+ner_model_file	ner_model_l1
+parser_model_file	dependency_model_l1
+dict_file	dict.txt
+segsen	1
+task	parse
